@@ -19,7 +19,7 @@ def get_posts(db: Session = Depends(get_db), user_id: int =  Depends(oauth2.get_
 
 #Posts 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int =  Depends(oauth2.get_current_user)):
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int =  Depends(oauth2.get_current_user)):
     #extract data from body
     # post_dict = new_post.dict()
     # post_dict['id'] = randrange(0, 1000000)
@@ -31,16 +31,16 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), user_id
     # conn.commit()
     
     # CREATING WITH SQL ALCHEMY
-    print(user_id)
-    post_added = models.Post(**post.dict())
-    db.add(post_added)
+    print(current_user.email)
+    new_post = models.Post(**post.dict())
+    db.add(new_post)
     db.commit()
-    db.refresh(post_added)
+    db.refresh(new_post)
 
-    return post_added
+    return new_post
 
 @router.get("/{id}", response_model=schemas.Post)
-def get_post(id: int, db: Session = Depends(get_db), user_id: int =  Depends(oauth2.get_current_user)):
+def get_post(id: int, db: Session = Depends(get_db), current_user: int =  Depends(oauth2.get_current_user)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
     # post = cursor.fetchone()
     
@@ -52,7 +52,7 @@ def get_post(id: int, db: Session = Depends(get_db), user_id: int =  Depends(oau
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_Post(id: int, db: Session = Depends(get_db), user_id: int =  Depends(oauth2.get_current_user)):
+def delete_Post(id: int, db: Session = Depends(get_db), current_user: int =  Depends(oauth2.get_current_user)):
     
     # cursor.execute(""" DELETE FROM posts WHERE id = %s RETURNING * """, (str(id),)) 
     # deleted_post = cursor.fetchone()
@@ -67,7 +67,7 @@ def delete_Post(id: int, db: Session = Depends(get_db), user_id: int =  Depends(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}", response_model=schemas.Post)
-def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int =  Depends(oauth2.get_current_user)):
+def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int =  Depends(oauth2.get_current_user)):
     
     # cursor.execute("""UPDATE posts SET title = %s, name = %s, age = %s WHERE id = %s RETURNING *""", (post.title, post.name, post.age, str(id),))
     # updated_post = cursor.fetchone()
